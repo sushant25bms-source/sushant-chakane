@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gym Tracker</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+}
+
+header {
+    background: #020617;
+    padding: 15px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    background: #1e293b;
+}
+
+nav button {
+    background: none;
+    border: none;
+    color: white;
+    padding: 15px 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+nav button:hover {
+    background: #334155;
+}
+
+section {
+    display: none;
+    padding: 20px;
+}
+
+.active {
+    display: block;
+}
+
+.card {
+    background: #1e293b;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 10px;
+}
+
+input, button {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    border: none;
+}
+
+button.add {
+    background: #22c55e;
+    color: white;
+}
+
+button.delete {
+    background: #ef4444;
+    color: white;
+}
+</style>
+</head>
+
+<body>
+
+<header>🏋️ Gym Freak Tracker</header>
+
+<nav>
+    <button onclick="showPage('home')">Home</button>
+    <button onclick="showPage('workout')">Workout</button>
+    <button onclick="showPage('diet')">Diet</button>
+</nav>
+
+<!-- HOME -->
+<section id="home" class="active">
+    <h2>Welcome 💪</h2>
+    <p>Track your workouts and diet to stay fit and consistent.</p>
+</section>
+
+<!-- WORKOUT -->
+<section id="workout">
+    <h2>Workout Tracker</h2>
+    
+    <input type="text" id="exercise" placeholder="Exercise (e.g. Bench Press)">
+    <input type="number" id="sets" placeholder="Sets">
+    <input type="number" id="reps" placeholder="Reps">
+    <button class="add" onclick="addWorkout()">Add Workout</button>
+
+    <div id="workoutList"></div>
+</section>
+
+<!-- DIET -->
+<section id="diet">
+    <h2>Diet Tracker</h2>
+    
+    <input type="text" id="food" placeholder="Food item">
+    <input type="number" id="calories" placeholder="Calories">
+    <button class="add" onclick="addDiet()">Add Meal</button>
+
+    <div id="dietList"></div>
+</section>
+
+<script>
+// PAGE SWITCH
+function showPage(page) {
+    document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+    document.getElementById(page).classList.add("active");
+}
+
+// LOAD DATA
+let workouts = JSON.parse(localStorage.getItem("workouts")) || [];
+let diets = JSON.parse(localStorage.getItem("diets")) || [];
+
+// ADD WORKOUT
+function addWorkout() {
+    let exercise = document.getElementById("exercise").value;
+    let sets = document.getElementById("sets").value;
+    let reps = document.getElementById("reps").value;
+
+    if (!exercise || !sets || !reps) return alert("Fill all fields");
+
+    workouts.push({ exercise, sets, reps });
+    localStorage.setItem("workouts", JSON.stringify(workouts));
+
+    displayWorkouts();
+}
+
+// DISPLAY WORKOUT
+function displayWorkouts() {
+    let list = document.getElementById("workoutList");
+    list.innerHTML = "";
+
+    workouts.forEach((w, index) => {
+        list.innerHTML += `
+        <div class="card">
+            ${w.exercise} - ${w.sets} sets x ${w.reps} reps
+            <br>
+            <button class="delete" onclick="deleteWorkout(${index})">Delete</button>
+        </div>`;
+    });
+}
+
+// DELETE WORKOUT
+function deleteWorkout(index) {
+    workouts.splice(index, 1);
+    localStorage.setItem("workouts", JSON.stringify(workouts));
+    displayWorkouts();
+}
+
+// ADD DIET
+function addDiet() {
+    let food = document.getElementById("food").value;
+    let calories = document.getElementById("calories").value;
+
+    if (!food || !calories) return alert("Fill all fields");
+
+    diets.push({ food, calories });
+    localStorage.setItem("diets", JSON.stringify(diets));
+
+    displayDiets();
+}
+
+// DISPLAY DIET
+function displayDiets() {
+    let list = document.getElementById("dietList");
+    list.innerHTML = "";
+
+    diets.forEach((d, index) => {
+        list.innerHTML += `
+        <div class="card">
+            ${d.food} - ${d.calories} kcal
+            <br>
+            <button class="delete" onclick="deleteDiet(${index})">Delete</button>
+        </div>`;
+    });
+}
+
+// DELETE DIET
+function deleteDiet(index) {
+    diets.splice(index, 1);
+    localStorage.setItem("diets", JSON.stringify(diets));
+    displayDiets();
+}
+
+// INITIAL LOAD
+displayWorkouts();
+displayDiets();
+
+</script>
+
+</body>
+</html>
